@@ -1,0 +1,111 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: "Kafka Multi Tenancy Demo"
+
+# Short description of this project
+description: |-
+  This repository serves as an example for managing multi-tenant Kafka clusters with Git and Flux v2.
+
+# Canonical GitHub repo
+github_repo: osodevops/confluent-openshift-team-alpha-resources
+
+# How to use this project
+usage: |-
+  ### Diagram
+  TODO
+
+# Example usage
+examples: |-
+  ### Getting Started
+  #### Requirements
+  * [Complete installation of demo cluster](https://github.com/osodevops/confluent-openshift-gitops-demo)
+  * [Flux CLI](https://fluxcd.io/docs/cmd/)
+  * [k9s](https://github.com/derailed/k9s) (optional but good idea)
+
+  ### Repository structure
+  The [Confluent Openshift example](https://github.com/osodevops/confluent-openshift-gitops-demo) repository contains the following directory structure under the cluster-manifests:
+    * ***clusters*** dir contains the Flux configuration per cluster 
+    * ***operators*** dir contains common operators such as Confluent, CRDs and cluster-wide polices
+      ```shell
+        ├── cluster-manifests
+        │   ├── clusters
+        │   │   ├── development-ocp
+        │   │   │   └── flux-system
+        │   │   │       ├── gotk-components.yaml
+        │   │   │       ├── gotk-sync.yaml
+        │   │   │       ├── kustomization.yaml
+        │   │   │       └── operators.yaml
+        │   │   └── production-ocp
+        │   │       └── flux-system
+        │   │           ├── gotk-components.yaml
+        │   │           ├── gotk-sync.yaml
+        │   │           ├── kustomization.yaml
+        │   │           └── operators.yaml
+        │   └── operators
+        │       ├── confluent.yaml
+        │       ├── kustomization.yaml
+        │       └── namespaces.yaml
+        └── policy
+        └── confluent-security-context.yaml
+      ```
+  A [tenant repository](https://github.com/osodevops/confluent-openshift-team-alpha-resources) contains the following top directories for deploying Kafka in their own isolated namespace:
+    * ***confluent*** dir contains Confluent component CRD manifests. Topology of the Kafka cluster you want to deploy 
+    * ***connectors*** dir contains Kafka connectors with configuration / credentials in Confluent CRD format
+    * ***topics*** dir contains all topics for current tenant in Confluent CRD format
+      ```shell
+        ├── confluent
+        │   ├── ca-pair-sslcerts.yaml
+        │   ├── connect-cluster.yaml
+        │   ├── kafka.yaml
+        │   ├── kustomization.yaml
+        │   ├── schema-registry.yaml
+        │   ├── tls-group1.yaml
+        │   └── zookeeper.yaml
+        ├── connectors
+        │   ├── kustomization.yaml
+        │   └── sample-connector.yaml
+        ├── kustomization.yaml
+        └── topics
+        ├── foobar.yaml
+        ├── gitops4lyfe.yaml
+        └── kustomization.yaml
+      ```  
+  
+  ### Onboarding new Kafka Tenants
+  Providing you have completed the steps of bootstrapping the cluster and have successfully deployed the Confluent operator you can now deploy any number of tenant isolated Kafka clusters. 
+  The Flux CLI offers commands to generate the Kubernetes manifests needed to define tenants with their RBAC permissions. Assuming the central Kafka admin wants to create a tenant named 
+  alpha-team with their apps having the ability to access Kafka in the same namespace:
+    - Fork this repository and create the sync manifests for the tenant Git repository:
+      ```shell
+        flux create source git team-alpha-resources \
+        --namespace=team-alpha \
+        --url=https://github.com/<org>/<dev-team> \
+        --branch=main \
+        --export > ./tenants/base/team-alpha/sync.yaml
+        
+        flux create kustomization team-alpha-resources \
+        --namespace=team-alpha \
+        --service-account=team-alpha \
+        --source=GitRepository/team-alpha-resources \
+        --path="./" \
+        --export >> ./tenants/base/team-alpha/sync.yaml
+      ```  
+
+related:
+  - name: "Confluent for Kubernetes (CFK) examples"
+    description: "Playground for Kafka / Confluent Kubernetes experimentations"
+    url: "https://github.com/osodevops/confluent-kubernetes-playground"
+  - name: "Confluent Platform on Azure"
+    description: "Terraform module to deploy CP using supported Ansible scripts"
+    url: "https://github.com/osodevops/terraform-azure-confluent-platform"
+  - name: "Confluent Platform on AWS"
+    description: "Terraform module to deploy CP using supported Ansible scripts"
+    url: "https://github.com/osodevops/aws-terraform-module-confluent"
+  - name: "CP Ansible Docker"
+    description: "Docker wrapper to run CP Ansible on air gapped environments"
+    url: "https://github.com/osodevops/docker-cp-ansible"
