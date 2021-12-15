@@ -36,8 +36,12 @@ This repository serves as an example for managing multi-tenant Kafka clusters wi
 
 ## Usage
 
+### Overview
+The [Confluent Openshift example](https://github.com/osodevops/confluent-openshift-gitops-demo) repository uses the Flux CLI to create the necessary manifests; making it super confusing to follow. 
+To help visualize the workflow, we will be working with the following Repositories with arrows representing the Flux Kustomization resources linking things together.
+
 ### Diagram
-TODO
+![solution_diagram](https://lucid.app/publicSegments/view/9b250e19-7b9e-4543-af55-58036e96058b/image.png)
 
 
 
